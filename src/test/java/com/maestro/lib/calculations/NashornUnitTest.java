@@ -1,6 +1,6 @@
-package com.maestro.lib.jscript;
+package com.maestro.lib.calculations;
 
-import com.maestro.lib.jscript.document.DocumentVar;
+import com.maestro.lib.calculations.document.DocumentVar;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -20,7 +20,7 @@ public class NashornUnitTest {
     @BeforeAll
     public void setUp() throws ScriptException {
         engine = ScriptEngineManagerUtils.scriptEngine("nashorn");
-        engine.eval("var console = Java.type('com.maestro.lib.jscript.JSConsole');");
+        engine.eval("var console = Java.type('com.maestro.lib.calculations.JSConsole');");
     }
 
     @Test

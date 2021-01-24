@@ -1,4 +1,4 @@
-package com.maestro.lib.jscript;
+package com.maestro.lib.calculations;
 
 /**
  * Represents jscript object "console"

@@ -1,6 +1,6 @@
-package com.maestro.lib.jscript.document;
+package com.maestro.lib.calculations.document;
 
-import com.maestro.lib.jscript.ScriptEngineManagerUtils;
+import com.maestro.lib.calculations.ScriptEngineManagerUtils;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -19,8 +19,8 @@ public class DocumentManagerUtils {
         this.engine = ScriptEngineManagerUtils.scriptEngine("nashorn");
         this.bindings = engine.createBindings();
         this.bindings.put("data", data);
-        this.engine.eval("var console = Java.type('com.maestro.lib.jscript.JSConsole');" +
-                "\nvar MATH_MODULE = Java.type('com.maestro.lib.jscript.JSMathModule');" +
+        this.engine.eval("var console = Java.type('com.maestro.lib.calculations.JSConsole');" +
+                "\nvar MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');" +
                 "\n Math.MIN = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MIN(arguments); };" +
                 "\n Math.MAX = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MAX(arguments); };" +
                 "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +

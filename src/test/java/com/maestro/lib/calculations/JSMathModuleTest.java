@@ -1,4 +1,4 @@
-package com.maestro.lib.jscript;
+package com.maestro.lib.calculations;
 
 import org.junit.jupiter.api.Test;
 

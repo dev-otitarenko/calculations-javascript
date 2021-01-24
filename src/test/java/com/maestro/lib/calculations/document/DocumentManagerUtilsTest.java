@@ -1,4 +1,4 @@
-package com.maestro.lib.jscript.document;
+package com.maestro.lib.calculations.document;
 
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;

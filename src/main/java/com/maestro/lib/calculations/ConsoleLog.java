@@ -1,4 +1,4 @@
-package com.maestro.lib.jscript;
+package com.maestro.lib.calculations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.maestro.lib.jscript;
+package com.maestro.lib.calculations;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class NashornJSConsoleTest {
     @BeforeAll
     public void setUp() throws ScriptException {
         engine = ScriptEngineManagerUtils.scriptEngine("nashorn");
-        engine.eval("var console = Java.type('com.maestro.lib.jscript.JSConsole');");
+        engine.eval("var console = Java.type('com.maestro.lib.calculations.JSConsole');");
     }
 
     @Test
