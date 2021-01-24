@@ -1,7 +1,4 @@
-# Playing with ScriptManager
-
-
-Running simple jscript constuctions on server side.
+# Running simple jscript-constructions on the server side. Playing with ScriptManager
 
 Input in JSON format, The set of data with unique fields names:
 ```
