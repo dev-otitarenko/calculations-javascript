@@ -1,12 +1,9 @@
 package com.maestro.lib.jscript;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 public class ScriptEngineManagerUtils {
@@ -14,15 +11,15 @@ public class ScriptEngineManagerUtils {
 
     public static ScriptEngine scriptEngine(String nm) {
         ScriptEngineManager manager = new ScriptEngineManager();
-        List<ScriptEngineFactory> engines = manager.getEngineFactories();
-
-        for (ScriptEngineFactory engine : engines) {
-            LOGGER.info("Engine name: {}, version: {}, language: {}", engine.getEngineName(), engine.getEngineVersion(), engine.getLanguageName());
-            LOGGER.info("Short Names:");
-            for (String names : engine.getNames()) {
-                LOGGER.info(names);
-            }
-        }
+//        List<ScriptEngineFactory> engines = manager.getEngineFactories();
+//
+////        for (ScriptEngineFactory engine : engines) {
+////            LOGGER.info("Engine name: {}, version: {}, language: {}", engine.getEngineName(), engine.getEngineVersion(), engine.getLanguageName());
+////            LOGGER.info("Short Names:");
+////            for (String names : engine.getNames()) {
+////                LOGGER.info(names);
+////            }
+////        }
         return manager.getEngineByName(nm);
     }
 }
