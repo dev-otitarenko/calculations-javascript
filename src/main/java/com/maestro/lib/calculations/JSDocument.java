@@ -4,7 +4,6 @@ import com.maestro.lib.calculations.document.DocumentVar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +13,23 @@ public class JSDocument {
 
     private static List<DocumentVar> data = new ArrayList<>();
 
+    /**
+     * Sets a document data for using
+     *
+     * @param v The document data set
+     */
     public static void set(final List<DocumentVar> v) {
         data = v;
     }
 
+    /**
+     * Gets the field value.
+     *
+     * @param nm The field name
+     * @param tnum - The table number
+     * @param nrow - The row number
+     * @return Object - The field value
+     */
     public static Object getValue(final String nm, final int tnum, final int nrow) {
         Optional<DocumentVar> fld = data
                                     .stream()
@@ -29,6 +41,14 @@ public class JSDocument {
         return null;
     }
 
+    /**
+     * Sets the field value for a specific field
+     *
+     * @param nm - The field name
+     * @param tnum - The table number
+     * @param nrow - The row number
+     * @param val - The value
+     */
     public static void setValue(final String nm,
                                 final int tnum,
                                 final int nrow,
@@ -44,18 +64,34 @@ public class JSDocument {
        }
 
         data.add(new DocumentVar(nm, tnum, nrow, val, true));
-//       data
-//          .stream()
-//          .map(f -> f.getField().equals(nm) && f.getTabn() == tnum && f.getNrow() == nrow ? f.setVal(val);)
-//        LOGGER.info("put {}, {}, {}, \"{}\"", nm, tnum, nrow, val);
-//
-//        List<DocumentVar> ret = new ArrayList<>();
-//        ret.addAll(data);
-//        ret.add(new DocumentVar(nm, tnum, nrow, val, true));
-//
-//        data = ret;
     }
 
+    /**
+     * Returns true if a specific field was changed
+     *
+     * @param nm - The field name
+     * @param tnum - The table number
+     * @param nrow - The row number
+     * @return boolean - true - the field was changed, false - the field was not changed
+     */
+    public static boolean isChanged(final String nm,
+                                    final int tnum,
+                                    final int nrow) {
+        Optional<DocumentVar> fld = data
+                .stream()
+                .filter(f -> f.getField().equals(nm) && f.getTabn() == tnum && f.getNrow() == nrow)
+                .findAny();
+        if (fld.isPresent()) {
+            return fld.get().isDirty();
+        }
+        return false;
+    }
+
+    /**
+     * Gets the document data set
+     *
+     * @return List - The document data set
+     */
     public static List<DocumentVar> get() {
         return data;
     }

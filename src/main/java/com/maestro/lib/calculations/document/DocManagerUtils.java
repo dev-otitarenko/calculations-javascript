@@ -34,7 +34,8 @@ public class DocManagerUtils {
                 "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +
                 "\n Math.AVG = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.AVG(arguments); };" +
                 "\n getValue = function(nm, tbNum, rn) { return DOC_MODULE.getValue(nm, tbNum, rn); };" +
-                "\n setValue = function(nm, v, tbNum, rn) { return DOC_MODULE.setValue(nm, tbNum, rn, v); };",
+                "\n setValue = function(nm, v, tbNum, rn) { return DOC_MODULE.setValue(nm, tbNum, rn, v); };" +
+                "\n isValueChanged = function(nm, tbNum, rn) { return DOC_MODULE.isChanged(nm, tbNum, rn); };",
                 bindings);
         this.data = data;
         this.rules = rules;
@@ -65,7 +66,11 @@ public class DocManagerUtils {
             .forEach(r -> {
                 try {
                     final String nm = r.getField();
-                    engine.eval(String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression())), bindings);
+                    final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
+
+                    LOGGER.info("calculate: {}", expr);
+                    engine.eval(expr, bindings);
+                    calculate(nm);
                 } catch (ScriptException e) {
                     e.printStackTrace();
                 }
@@ -76,6 +81,29 @@ public class DocManagerUtils {
         } else {
             throw new ScriptException("ScriptException: result is not List");
         }
+    }
+
+    private void calculate(final String srcNm) {
+        rules
+            .stream()
+            .filter(r -> r.isOnlyFilling() && r.getSign().equals("=") && r.getExpression().contains("^" + srcNm))
+            .forEach(r -> {
+                try {
+                    Boolean isChanged = (Boolean)engine.eval(String.format("isValueChanged('%s', %d, %d)", srcNm, 0, 0), bindings);
+                    if (!isChanged) {
+                        final String nm = r.getField();
+                        final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
+
+                        LOGGER.info("\t[%s] calculate: {}", srcNm, expr);
+                        engine.eval(expr, bindings);
+
+                        calculate(nm);
+                    }
+                } catch (ScriptException e) {
+                    e.printStackTrace();
+                }
+            });
+
     }
 
     public Object execRule(final ValidateRule r) throws ScriptException {

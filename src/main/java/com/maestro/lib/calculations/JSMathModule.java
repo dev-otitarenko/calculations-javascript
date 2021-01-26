@@ -17,99 +17,118 @@ public class JSMathModule {
     @SuppressWarnings("restriction")
     public static double MIN(Object objects) {
         if (objects instanceof ScriptObjectMirror) {
-            ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) objects;
-            OptionalDouble ret = scriptObjectMirror
+            ScriptObjectMirror jsObjects = (ScriptObjectMirror) objects;
+            OptionalDouble res = jsObjects
                     .values()
                     .stream()
                     .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                     .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                     .min();
-            return ret.isPresent() ? ret.getAsDouble() : 0;
+            double ret = res.isPresent() ? res.getAsDouble() : 0;
+            LOGGER.debug("MIN: {}", ret);
+
+            return ret;
         }
+        LOGGER.debug("MIN = 0");
+
         return 0;
     }
 
     public static double MIN(Object...objects) {
-        LOGGER.info("MIN: {}", objects.length);
-        OptionalDouble ret = stream(objects)
+        OptionalDouble res = stream(objects)
                 .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .min();
-        return ret.isPresent() ? ret.getAsDouble() : 0;
+        double ret = res.isPresent() ? res.getAsDouble() : 0;
+        LOGGER.debug("MIN_1: {}", ret);
+
+        return ret;
     }
 
     @SuppressWarnings("restriction")
     public static double MAX(Object objects) {
         if (objects instanceof ScriptObjectMirror) {
-            ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) objects;
-            OptionalDouble ret = scriptObjectMirror
+            ScriptObjectMirror jsObjects = (ScriptObjectMirror) objects;
+            OptionalDouble res = jsObjects
                     .values()
                     .stream()
                     .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                     .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                     .max();
-            return ret.isPresent() ? ret.getAsDouble() : 0;
+            double ret = res.isPresent() ? res.getAsDouble() : 0;
+            LOGGER.debug("MAX: {}", ret);
+
+            return ret;
         }
+
         return 0;
     }
 
     public static double MAX(Object...objects) {
-        LOGGER.info("MAX: {}", objects.length);
-        OptionalDouble ret = stream(objects)
+        OptionalDouble res = stream(objects)
                 .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .max();
-        return ret.isPresent() ? ret.getAsDouble() : 0;
+        double ret = res.isPresent() ? res.getAsDouble() : 0;
+        LOGGER.debug("MAX_1: {}", ret);
+
+        return ret;
     }
 
     @SuppressWarnings("restriction")
     public static double AVG(Object objects) {
         if (objects instanceof ScriptObjectMirror) {
-            ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) objects;
-//            LOGGER.info("AVG_1: {}", scriptObjectMirror.isArray());
-//            for (Map.Entry<String, Object> entry : scriptObjectMirror.entrySet()) {
-//                LOGGER.info("\t AVG1 {} : {}", entry.getKey(), entry.getValue());
-//            }
-
-            OptionalDouble ret = scriptObjectMirror
+            ScriptObjectMirror jsObjects = (ScriptObjectMirror) objects;
+            OptionalDouble res = jsObjects
                         .values()
                         .stream()
                         .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                         .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                         .average();
-            return ret.isPresent() ? ret.getAsDouble() : 0;
+            double ret = res.isPresent() ? res.getAsDouble() : 0;
+            LOGGER.debug("AVG: {}", ret);
+
+            return ret;
         }
         return 0;
     }
 
     public static double AVG(Object...objects) {
-        LOGGER.info("AVG: {}", objects.length);
-        OptionalDouble ret = stream(objects)
+        OptionalDouble res = stream(objects)
                 .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .average();
-        return ret.isPresent() ? ret.getAsDouble() : 0;
+        double ret = res.isPresent() ? res.getAsDouble() : 0;
+        LOGGER.debug("AVG_1: {}", ret);
+
+        return ret;
     }
 
     @SuppressWarnings("restriction")
     public static double SUM(Object objects) {
         if (objects instanceof ScriptObjectMirror) {
-            ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) objects;
-            return scriptObjectMirror
+            ScriptObjectMirror jsObjects = (ScriptObjectMirror) objects;
+            double ret = jsObjects
                     .values()
                     .stream()
                     .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                     .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                     .sum();
+            LOGGER.debug("SUM: {}", ret);
+
+            return ret;
         }
         return 0;
     }
 
     public static double SUM(Object...objects) {
         LOGGER.info("SUM: {}", objects.length);
-        return stream(objects)
+        double ret = stream(objects)
                 .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .sum();
+        LOGGER.debug("SUM_1: {}", ret);
+
+        return ret;
     }
 }

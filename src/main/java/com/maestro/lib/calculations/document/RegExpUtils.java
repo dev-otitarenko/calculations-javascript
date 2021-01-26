@@ -32,11 +32,16 @@ public class RegExpUtils {
      * @return List list of string
      */
     public static List<String> getMatches(String s, String p) {
+        LOGGER.debug("getMatches: {}, {}", s, p);
+
         List<String> matches = new ArrayList<>();
         final Matcher m = Pattern.compile(p).matcher(s);
         while(m.find()) {
             matches.add(m.group(1));
         }
+
+        matches.stream().parallel().forEach(i -> LOGGER.debug("getMatches: {}", i));
+
         return matches;
     }
 }
