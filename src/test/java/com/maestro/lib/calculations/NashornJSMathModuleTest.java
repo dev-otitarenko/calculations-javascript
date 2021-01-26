@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,7 +16,8 @@ public class NashornJSMathModuleTest {
 
     @BeforeAll
     public void setUp() throws ScriptException {
-        engine = ScriptEngineManagerUtils.scriptEngine("nashorn");
+        ScriptEngineManager manager = new ScriptEngineManager();
+        engine = manager.getEngineByName("nashorn");
         engine.eval("var MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');");
     }
 

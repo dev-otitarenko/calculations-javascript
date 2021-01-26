@@ -19,7 +19,8 @@ public class NashornUnitTest {
 
     @BeforeAll
     public void setUp() throws ScriptException {
-        engine = ScriptEngineManagerUtils.scriptEngine("nashorn");
+        ScriptEngineManager manager = new ScriptEngineManager();
+        engine = manager.getEngineByName("nashorn");
         engine.eval("var console = Java.type('com.maestro.lib.calculations.JSConsole');");
     }
 

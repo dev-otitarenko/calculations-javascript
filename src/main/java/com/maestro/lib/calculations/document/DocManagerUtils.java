@@ -1,31 +1,41 @@
 package com.maestro.lib.calculations.document;
 
-import com.maestro.lib.calculations.ScriptEngineManagerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocumentManagerUtils {
+public class DocManagerUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocManagerUtils.class);
+
     private final ScriptEngine engine;
     private final Bindings bindings;
-    private final List<DocumentVar> data;
+    private List<DocumentVar> data;
     private final List<ValidateRule> rules;
 
-    public DocumentManagerUtils(final List<DocumentVar> data,
-                                final List<ValidateRule> rules) throws ScriptException {
-        this.engine = ScriptEngineManagerUtils.scriptEngine("nashorn");
+    public DocManagerUtils(final List<DocumentVar> data,
+                           final List<ValidateRule> rules) throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        this.engine = manager.getEngineByName("nashorn");
         this.bindings = engine.createBindings();
         this.bindings.put("data", data);
-        this.engine.eval("var console = Java.type('com.maestro.lib.calculations.JSConsole');" +
-                "\nvar MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');" +
+        this.engine.eval(
+                "var console = Java.type('com.maestro.lib.calculations.JSConsole');" +
+                "\n var DOC_MODULE = Java.type('com.maestro.lib.calculations.JSDocument');" +
+                "\n var MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');" +
+                "\n DOC_MODULE.set(data);" +
                 "\n Math.MIN = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MIN(arguments); };" +
                 "\n Math.MAX = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MAX(arguments); };" +
                 "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +
                 "\n Math.AVG = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.AVG(arguments); };" +
-                "\n var getValue = function(nm, tbNum, rn) { var rdata; for (var i in data) { rdata = data[i]; if (rdata.field === nm) return rdata.val; } return null; };", bindings);
+                "\n getValue = function(nm, tbNum, rn) { return DOC_MODULE.getValue(nm, tbNum, rn); };" +
+                "\n setValue = function(nm, v, tbNum, rn) { return DOC_MODULE.setValue(nm, tbNum, rn, v); };",
+                bindings);
         this.data = data;
         this.rules = rules;
     }
@@ -33,10 +43,39 @@ public class DocumentManagerUtils {
     public List<ValidateError> validate() {
         List<ValidateError> ret = new ArrayList<>();
         rules
-            .stream()
+            .stream().parallel()
             .filter(r -> r.isOnlyChecking() && !r.getSign().equals("*"))
             .forEach(r -> ret.add(validateRule(r)));
         return ret;
+    }
+
+    public List<ValidateError> validateParallel() {
+        List<ValidateError> ret = new ArrayList<>();
+        rules
+            .parallelStream()
+            .filter(r -> r.isOnlyChecking() && !r.getSign().equals("*"))
+            .forEach(r -> ret.add(validateRule(r)));
+        return ret;
+    }
+
+    public void calculate() throws ScriptException {
+        rules
+            .stream()
+            .filter(r -> r.isOnlyFilling() && r.getSign().equals("="))
+            .forEach(r -> {
+                try {
+                    final String nm = r.getField();
+                    engine.eval(String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression())), bindings);
+                } catch (ScriptException e) {
+                    e.printStackTrace();
+                }
+            });
+        Object result = engine.eval("DOC_MODULE.get()", bindings);
+        if (result instanceof List) {
+            this.data = (List<DocumentVar>)result;
+        } else {
+            throw new ScriptException("ScriptException: result is not List");
+        }
     }
 
     public Object execRule(final ValidateRule r) throws ScriptException {
@@ -46,6 +85,8 @@ public class DocumentManagerUtils {
     private ValidateError validateRule(final ValidateRule r) {
         final String sign = r.getSign().equals("=") ? "==" : r.getSign();
         final String rule = String.format("getValue(\"%s\", 0, 0) %s (%s)", r.getField(), sign, parseRule(r.getExpression()));
+
+        LOGGER.info("validateRule: {}", rule);
 
         try {
             Object val = engine.eval(rule, bindings);
@@ -66,6 +107,10 @@ public class DocumentManagerUtils {
             }
         }
         return ret;
+    }
+
+    public List<DocumentVar> data() {
+        return this.data;
     }
 }
 

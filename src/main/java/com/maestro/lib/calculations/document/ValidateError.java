@@ -18,5 +18,10 @@ public class ValidateError {
     /**
      * Message with error if status != 0
      */
-    private String message; // Validate message if status == 0
+    private String message;
+
+    @Override
+    public String toString() {
+        return String.format("ValidateError { status: %d, message: '%s' }", status, message);
+    }
 }
