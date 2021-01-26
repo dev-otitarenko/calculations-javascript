@@ -30,13 +30,42 @@ public class NashornJSMathModuleTest {
         else
             assertEquals(((Integer) result).intValue(), 20);
 
-        result = engine.eval("MATH_MODULE.SUM(10, 20, 30);");
+        result = engine.eval("MATH_MODULE.AVG(10.0, 20.0, 30.0);");
+        System.out.println("AVG = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 20);
+        else
+            assertEquals(((Integer) result).intValue(), 20);
+
+        result = engine.eval("MATH_MODULE.AVG(\"9.5\", \"20.0\", \"30.5\");");
+        System.out.println("AVG = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 20);
+        else
+            assertEquals(((Integer) result).intValue(), 20);
+
+        result = engine.eval("MATH_MODULE.SUM(150, 250, 50);");
         System.out.println("SUM = " + result.toString());
         if (result instanceof Double)
-            assertEquals(((Double) result).doubleValue(), 60);
+            assertEquals(((Double) result).doubleValue(), 450);
         else
-            assertEquals(((Integer) result).intValue(), 60);
+            assertEquals(((Integer) result).intValue(), 450);
 
+
+        result = engine.eval("MATH_MODULE.SUM(150.0, 250.0, 50.0);");
+        System.out.println("SUM = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 450);
+        else
+            assertEquals(((Integer) result).intValue(), 450);
+
+        result = engine.eval("MATH_MODULE.SUM(\"150.50\", \"250.30\", \"50.20\");");
+        System.out.println("SUM = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 451.0);
+        else
+            assertEquals(((Integer) result).intValue(), 450.0);
+            //
         result = engine.eval("MATH_MODULE.MIN(10, 20, 30);");
         System.out.println("MIN = " + result.toString());
         if (result instanceof Double)
@@ -44,12 +73,34 @@ public class NashornJSMathModuleTest {
         else
             assertEquals(((Integer) result).intValue(), 10);
 
+        result = engine.eval("MATH_MODULE.MIN(\"10\", \"20\", \"30\");");
+        System.out.println("MIN = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 10);
+        else
+            assertEquals(((Integer) result).intValue(), 10);
+
+            //
         result = engine.eval("MATH_MODULE.MAX(10, 20, 30);");
         System.out.println("MAX = " + result.toString());
         if (result instanceof Double)
             assertEquals(((Double) result).doubleValue(), 30);
         else
             assertEquals(((Integer) result).intValue(), 30);
+
+        result = engine.eval("MATH_MODULE.MAX(10.0, 20.0, 30.0);");
+        System.out.println("MAX = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 30);
+        else
+            assertEquals(((Integer) result).intValue(), 30);
+
+        result = engine.eval("MATH_MODULE.MAX(\"10.0\", \"20.0\", \"30.30\");");
+        System.out.println("MAX = " + result.toString());
+        if (result instanceof Double)
+            assertEquals(((Double) result).doubleValue(), 30.3);
+        else
+            assertEquals(((Integer) result).intValue(), 30.3);
     }
 
     @Test

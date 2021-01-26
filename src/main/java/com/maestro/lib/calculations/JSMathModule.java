@@ -21,7 +21,7 @@ public class JSMathModule {
             OptionalDouble res = jsObjects
                     .values()
                     .stream()
-                    .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                    .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                     .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                     .min();
             double ret = res.isPresent() ? res.getAsDouble() : 0;
@@ -30,13 +30,12 @@ public class JSMathModule {
             return ret;
         }
         LOGGER.debug("MIN = 0");
-
         return 0;
     }
 
     public static double MIN(Object...objects) {
         OptionalDouble res = stream(objects)
-                .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .min();
         double ret = res.isPresent() ? res.getAsDouble() : 0;
@@ -52,7 +51,7 @@ public class JSMathModule {
             OptionalDouble res = jsObjects
                     .values()
                     .stream()
-                    .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                    .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                     .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                     .max();
             double ret = res.isPresent() ? res.getAsDouble() : 0;
@@ -60,13 +59,13 @@ public class JSMathModule {
 
             return ret;
         }
-
+        LOGGER.debug("MAX = 0");
         return 0;
     }
 
     public static double MAX(Object...objects) {
         OptionalDouble res = stream(objects)
-                .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .max();
         double ret = res.isPresent() ? res.getAsDouble() : 0;
@@ -82,7 +81,7 @@ public class JSMathModule {
             OptionalDouble res = jsObjects
                         .values()
                         .stream()
-                        .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                        .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                         .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                         .average();
             double ret = res.isPresent() ? res.getAsDouble() : 0;
@@ -90,12 +89,13 @@ public class JSMathModule {
 
             return ret;
         }
+        LOGGER.debug("AVG = 0");
         return 0;
     }
 
     public static double AVG(Object...objects) {
         OptionalDouble res = stream(objects)
-                .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .average();
         double ret = res.isPresent() ? res.getAsDouble() : 0;
@@ -111,23 +111,26 @@ public class JSMathModule {
             double ret = jsObjects
                     .values()
                     .stream()
-                    .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
-                    .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
+                    .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
+                    .mapToDouble(o -> (o instanceof Integer) ?
+                                        Double.valueOf((Integer)o) :
+                                        (o instanceof Double ? (Double)o : Double.valueOf((String)o))
+                    )
                     .sum();
             LOGGER.debug("SUM: {}", ret);
 
             return ret;
         }
+        LOGGER.debug("SUM = 0");
         return 0;
     }
 
     public static double SUM(Object...objects) {
-        LOGGER.info("SUM: {}", objects.length);
         double ret = stream(objects)
-                .filter(o -> o instanceof Integer || o instanceof Double || (NumberUtils.isCreatable((String) o) && NumberUtils.isDigits((String) o)))
+                .filter(o -> o instanceof Integer || o instanceof Double || NumberUtils.isCreatable((String) o))
                 .mapToDouble(o -> (o instanceof Integer) ? Double.valueOf((Integer)o) : (o instanceof Double ? (Double)o : Double.valueOf((String)o)))
                 .sum();
-        LOGGER.debug("SUM_1: {}", ret);
+        LOGGER.info("SUM_1: {}", ret);
 
         return ret;
     }

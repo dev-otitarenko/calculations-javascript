@@ -48,6 +48,6 @@ public class DocumentVar {
 
     @Override
     public String toString() {
-        return String.format("DocumentVat { [%b] field: \"%s\", tabn: %d, nrow: %d, val: %s }", this.dirty, this.field, this.tabn, this.nrow, this.val);
+        return String.format("DocumentVar { [%b] field: \"%s\", tabn: %d, nrow: %d, val: %s }", this.dirty, this.field, this.tabn, this.nrow, this.val);
     }
 }
