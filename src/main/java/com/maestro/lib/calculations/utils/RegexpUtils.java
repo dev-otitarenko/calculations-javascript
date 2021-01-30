@@ -1,4 +1,4 @@
-package com.maestro.lib.calculations.document;
+package com.maestro.lib.calculations.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,19 +11,8 @@ import java.util.regex.Pattern;
 /**
  * Regexp utils
  */
-public class RegExpUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegExpUtils.class);
-
-    /**
-     *
-     * @param s input string
-     * @param p regexp pattern
-     * @return String
-     */
-    public static String getMatch(String s, String p) {
-        final Matcher m = Pattern.compile(p).matcher(s);
-        return m.find() ? m.group(1) : "";
-    }
+public class RegexpUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegexpUtils.class);
 
     /**
      *
@@ -32,7 +21,7 @@ public class RegExpUtils {
      * @return List list of string
      */
     public static List<String> getMatches(String s, String p) {
-        LOGGER.debug("getMatches: {}, {}", s, p);
+        LOGGER.trace("getMatches: {}, {}", s, p);
 
         List<String> matches = new ArrayList<>();
         final Matcher m = Pattern.compile(p).matcher(s);
@@ -40,7 +29,7 @@ public class RegExpUtils {
             matches.add(m.group(1));
         }
 
-        matches.stream().parallel().forEach(i -> LOGGER.debug("getMatches: {}", i));
+        matches.stream().parallel().forEach(i -> LOGGER.trace("getMatches: {}", i));
 
         return matches;
     }
