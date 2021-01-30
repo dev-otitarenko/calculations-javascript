@@ -1,0 +1,44 @@
+[
+  {
+    "field": "FIELD100",
+    "sign": "\u003d",
+    "expression": "^FIELD1*^FIELD2 + ^FIELD3",
+    "onlyFilling": true,
+    "onlyChecking": true
+  },
+  {
+    "field": "FIELD101",
+    "sign": "\u003d",
+    "expression": "^FIELD1 + ^FIELD3",
+    "onlyFilling": true,
+    "onlyChecking": true
+  },
+  {
+    "field": "FIELD102",
+    "sign": "\u003d",
+    "expression": "^FIELD1 - ^FIELD3",
+    "onlyFilling": true,
+    "onlyChecking": true
+  },
+  {
+    "field": "FIELD200",
+    "sign": "\u003d",
+    "expression": "Math.SUM(^FIELD101,^FIELD102,^FIELD100)",
+    "onlyFilling": true,
+    "onlyChecking": true
+  },
+  {
+    "field": "FIELD201",
+    "sign": "\u003d",
+    "expression": "Math.MIN(^FIELD101,^FIELD102,^FIELD100)",
+    "onlyFilling": true,
+    "onlyChecking": true
+  },
+  {
+    "field": "FIELD202",
+    "sign": "\u003d",
+    "expression": "Math.MAX(^FIELD101,^FIELD102,^FIELD100)",
+    "onlyFilling": true,
+    "onlyChecking": true
+  }
+]

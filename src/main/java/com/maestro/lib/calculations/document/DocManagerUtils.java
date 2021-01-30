@@ -83,6 +83,38 @@ public class DocManagerUtils {
         }
     }
 
+    public void onChangeFieldValue(final String srcNm, final Object val) throws ScriptException {
+            // set value
+        engine.eval(String.format("setValue('%s', %s, 0, 0)", srcNm, val), bindings);
+            // loop through rules
+        rules
+            .stream()
+            .filter(r -> r.isOnlyFilling() && r.getSign().equals("="))
+            .forEach(r -> {
+                LOGGER.info(" [{}] onChangeFieldValue: {}", r.getExpression(), r.getExpression().indexOf("^" + srcNm) >= 0);
+
+                if (r.getExpression().indexOf("^" + srcNm) >= 0) {
+                    try {
+                        final String nm = r.getField();
+                        final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
+
+                        LOGGER.info("\t[{}] onChangeFieldValue: {}", srcNm, expr);
+                        engine.eval(expr, bindings);
+
+                        //calculate(nm);
+                    } catch (ScriptException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        Object result = engine.eval("DOC_MODULE.get()", bindings);
+        if (result instanceof List) {
+            this.data = (List<DocumentVar>)result;
+        } else {
+            throw new ScriptException("ScriptException: result is not List");
+        }
+    }
+
     private void calculate(final String srcNm) {
         rules
             .stream()
@@ -94,7 +126,7 @@ public class DocManagerUtils {
                         final String nm = r.getField();
                         final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
 
-                        LOGGER.info("\t[%s] calculate: {}", srcNm, expr);
+                        LOGGER.info("\t[{}] calculate: {}", srcNm, expr);
                         engine.eval(expr, bindings);
 
                         calculate(nm);
@@ -103,7 +135,6 @@ public class DocManagerUtils {
                     e.printStackTrace();
                 }
             });
-
     }
 
     public Object execRule(final ValidateRule r) throws ScriptException {

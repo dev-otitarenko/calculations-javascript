@@ -97,6 +97,27 @@ class DocManagerUtilsTest {
         checkDocumentData(ret, result);
     }
 
+    @ParameterizedTest
+    @CsvSource(
+            value = { "scenario-3-data.json:scenario-3-rules.json:FIELD1:100:scenario-3-result.json" },
+            delimiter = ':'
+    )
+    void onChangeFieldValue(final String path2document,
+                            final String path2rules,
+                            final String fieldNm,
+                            final double fieldVal,
+                            final String path2result) throws ScriptException, IOException {
+        Gson gson = new Gson();
+        final List<DocumentVar> data = convDocumentData(gson, path2document);
+        final List<ValidateRule> rules = convValidateRules(gson, path2rules);
+        final List<DocumentVar> result = convDocumentData(gson, path2result);
+
+        DocManagerUtils docManager = new DocManagerUtils(data, rules);
+        docManager.onChangeFieldValue(fieldNm, fieldVal);
+        final List<DocumentVar> ret = docManager.data();
+        checkDocumentData(ret, result);
+    }
+
     private List<DocumentVar> convDocumentData(Gson gson, final String fileName) throws IOException {
         final byte[] content = TestUtils.getFileContent((new TestUtils()).getResourceFile(fileName));
         Type typeData = new TypeToken<List<DocumentVar>>() {}.getType();
