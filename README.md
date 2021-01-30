@@ -1,13 +1,15 @@
 # Running simple jscript-constructions on the server side. Playing with ScriptManager
 
-Input in JSON format, The set of data with unique fields names:
-```
+Input is the data set with unique fields names in JSON format:
+
+```json
 {
 "Field1": 100,
 "Field2": 20,
 "Field3": 300
 }
 ```
+
 Example calculation formulas:
 ```sh
 Field100 = Field1 + Field2
