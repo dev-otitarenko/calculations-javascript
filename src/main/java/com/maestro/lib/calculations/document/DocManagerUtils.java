@@ -158,7 +158,15 @@ public class DocManagerUtils {
      * @throws ScriptException
      */
     public Object execRule(final ValidateRule r) throws ScriptException {
-        return engine.eval(parseRule(r.getExpression()));
+        final String rule = parseRule(r.getExpression());
+
+        LOGGER.debug("\"execRule\" is starting...expression: {}\n parsed expression: {}", r.getExpression(), rule);
+
+        final Object ret = engine.eval(rule);
+
+        LOGGER.debug("\"execRule\" has finished: {}", ret);
+
+        return ret;
     }
 
     private String parseRule(final String rule) {
