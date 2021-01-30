@@ -92,7 +92,7 @@ class DocManagerUtilsTest {
         final List<DocumentVar> result = convDocumentData(gson, path2result);
 
         DocManagerUtils docManager = new DocManagerUtils(data, rules);
-        docManager.calculate();
+        docManager.calculateAllFields();
         final List<DocumentVar> ret = docManager.data();
         checkDocumentData(ret, result);
     }
@@ -113,7 +113,7 @@ class DocManagerUtilsTest {
         final List<DocumentVar> result = convDocumentData(gson, path2result);
 
         DocManagerUtils docManager = new DocManagerUtils(data, rules);
-        docManager.onChangeFieldValue(fieldNm, fieldVal);
+        docManager.changeFieldValue(fieldNm, fieldVal);
         final List<DocumentVar> ret = docManager.data();
         checkDocumentData(ret, result);
     }

@@ -9,13 +9,14 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class DocManagerUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocManagerUtils.class);
 
     private final ScriptEngine engine;
     private final Bindings bindings;
-    private List<DocumentVar> data;
+    private static List<DocumentVar> data = new ArrayList<>();
     private final List<ValidateRule> rules;
 
     public DocManagerUtils(final List<DocumentVar> data,
@@ -26,16 +27,15 @@ public class DocManagerUtils {
         this.bindings.put("data", data);
         this.engine.eval(
                 "var console = Java.type('com.maestro.lib.calculations.JSConsole');" +
-                "\n var DOC_MODULE = Java.type('com.maestro.lib.calculations.JSDocument');" +
-                "\n var MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');" +
-                "\n DOC_MODULE.set(data);" +
-                "\n Math.MIN = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MIN(arguments); };" +
-                "\n Math.MAX = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MAX(arguments); };" +
-                "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +
-                "\n Math.AVG = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.AVG(arguments); };" +
-                "\n getValue = function(nm, tbNum, rn) { return DOC_MODULE.getValue(nm, tbNum, rn); };" +
-                "\n setValue = function(nm, v, tbNum, rn) { return DOC_MODULE.setValue(nm, tbNum, rn, v); };" +
-                "\n isValueChanged = function(nm, tbNum, rn) { return DOC_MODULE.isChanged(nm, tbNum, rn); };",
+                        "\n var DOC_MODULE = Java.type('com.maestro.lib.calculations.document.DocManagerUtils');" +
+                        "\n var MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');" +
+                        "\n Math.MIN = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MIN(arguments); };" +
+                        "\n Math.MAX = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MAX(arguments); };" +
+                        "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +
+                        "\n Math.AVG = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.AVG(arguments); };" +
+                        "\n getValue = function(nm, tbNum, rn) { return DOC_MODULE.getValue(nm, tbNum, rn); };" +
+                        "\n setValue = function(nm, v, tbNum, rn) { return DOC_MODULE.setValue(nm, tbNum, rn, v); };" +
+                        "\n isValueChanged = function(nm, tbNum, rn) { return DOC_MODULE.isChanged(nm, tbNum, rn); };",
                 bindings);
         this.data = data;
         this.rules = rules;
@@ -44,97 +44,85 @@ public class DocManagerUtils {
     public List<ValidateError> validate() {
         List<ValidateError> ret = new ArrayList<>();
         rules
-            .stream().parallel()
-            .filter(r -> r.isOnlyChecking() && !r.getSign().equals("*"))
-            .forEach(r -> ret.add(validateRule(r)));
+                .stream().parallel()
+                .filter(r -> r.isOnlyChecking() && !r.getSign().equals("*"))
+                .forEach(r -> ret.add(validateRule(r)));
         return ret;
     }
 
     public List<ValidateError> validateParallel() {
         List<ValidateError> ret = new ArrayList<>();
         rules
-            .parallelStream()
-            .filter(r -> r.isOnlyChecking() && !r.getSign().equals("*"))
-            .forEach(r -> ret.add(validateRule(r)));
+                .parallelStream()
+                .filter(r -> r.isOnlyChecking() && !r.getSign().equals("*"))
+                .forEach(r -> ret.add(validateRule(r)));
         return ret;
     }
 
-    public void calculate() throws ScriptException {
+    public void calculateAllFields() {
         rules
-            .stream()
-            .filter(r -> r.isOnlyFilling() && r.getSign().equals("="))
-            .forEach(r -> {
-                try {
-                    final String nm = r.getField();
-                    final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
-
-                    LOGGER.info("calculate: {}", expr);
-                    engine.eval(expr, bindings);
-                    calculate(nm);
-                } catch (ScriptException e) {
-                    e.printStackTrace();
-                }
-            });
-        Object result = engine.eval("DOC_MODULE.get()", bindings);
-        if (result instanceof List) {
-            this.data = (List<DocumentVar>)result;
-        } else {
-            throw new ScriptException("ScriptException: result is not List");
-        }
-    }
-
-    public void onChangeFieldValue(final String srcNm, final Object val) throws ScriptException {
-            // set value
-        engine.eval(String.format("setValue('%s', %s, 0, 0)", srcNm, val), bindings);
-            // loop through rules
-        rules
-            .stream()
-            .filter(r -> r.isOnlyFilling() && r.getSign().equals("="))
-            .forEach(r -> {
-                LOGGER.info(" [{}] onChangeFieldValue: {}", r.getExpression(), r.getExpression().indexOf("^" + srcNm) >= 0);
-
-                if (r.getExpression().indexOf("^" + srcNm) >= 0) {
+                .stream()
+                .filter(r -> r.isOnlyFilling() && r.getSign().equals("="))
+                .forEach(r -> {
                     try {
                         final String nm = r.getField();
                         final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
 
-                        LOGGER.info("\t[{}] onChangeFieldValue: {}", srcNm, expr);
+                        LOGGER.info("calculate: {}", expr);
                         engine.eval(expr, bindings);
-
-                        //calculate(nm);
+                        calculate(nm);
                     } catch (ScriptException e) {
                         e.printStackTrace();
                     }
-                }
-            });
-        Object result = engine.eval("DOC_MODULE.get()", bindings);
-        if (result instanceof List) {
-            this.data = (List<DocumentVar>)result;
-        } else {
-            throw new ScriptException("ScriptException: result is not List");
-        }
+                });
+    }
+
+    public void changeFieldValue(final String srcNm, final Object val) throws ScriptException {
+        // set value
+        engine.eval(String.format("setValue('%s', %s, 0, 0)", srcNm, val), bindings);
+        // loop through rules
+        rules
+                .stream()
+                .filter(r -> r.isOnlyFilling() && r.getSign().equals("="))
+                .forEach(r -> {
+                    LOGGER.info(" [{}] onChangeFieldValue: {}", r.getExpression(), r.getExpression().indexOf("^" + srcNm) >= 0);
+
+                    if (r.getExpression().indexOf("^" + srcNm) >= 0) {
+                        try {
+                            final String nm = r.getField();
+                            final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
+
+                            LOGGER.info("\t[{}] onChangeFieldValue: {}", srcNm, expr);
+                            engine.eval(expr, bindings);
+
+                            //calculate(nm);
+                        } catch (ScriptException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     private void calculate(final String srcNm) {
         rules
-            .stream()
-            .filter(r -> r.isOnlyFilling() && r.getSign().equals("=") && r.getExpression().contains("^" + srcNm))
-            .forEach(r -> {
-                try {
-                    Boolean isChanged = (Boolean)engine.eval(String.format("isValueChanged('%s', %d, %d)", srcNm, 0, 0), bindings);
-                    if (!isChanged) {
-                        final String nm = r.getField();
-                        final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
+                .stream()
+                .filter(r -> r.isOnlyFilling() && r.getSign().equals("=") && r.getExpression().contains("^" + srcNm))
+                .forEach(r -> {
+                    try {
+                        Boolean isChanged = (Boolean) engine.eval(String.format("isValueChanged('%s', %d, %d)", srcNm, 0, 0), bindings);
+                        if (!isChanged) {
+                            final String nm = r.getField();
+                            final String expr = String.format("setValue('%s', %s, 0, 0)", nm, parseRule(r.getExpression()));
 
-                        LOGGER.info("\t[{}] calculate: {}", srcNm, expr);
-                        engine.eval(expr, bindings);
+                            LOGGER.info("\t[{}] calculate: {}", srcNm, expr);
+                            engine.eval(expr, bindings);
 
-                        calculate(nm);
+                            calculate(nm);
+                        }
+                    } catch (ScriptException e) {
+                        e.printStackTrace();
                     }
-                } catch (ScriptException e) {
-                    e.printStackTrace();
-                }
-            });
+                });
     }
 
     public Object execRule(final ValidateRule r) throws ScriptException {
@@ -149,10 +137,10 @@ public class DocManagerUtils {
 
         try {
             Object val = engine.eval(rule, bindings);
-            Boolean res = (Boolean)val;
-            return new ValidateError(res == true ? 1 : 0, res == true ?  rule + " OK" : rule + " INVALID");
+            Boolean res = (Boolean) val;
+            return new ValidateError(res == true ? 1 : 0, res == true ? rule + " OK" : rule + " INVALID");
         } catch (ScriptException ex) {
-            return new ValidateError(-1, rule + ": " +  ex.getMessage());
+            return new ValidateError(-1, rule + ": " + ex.getMessage());
         }
     }
 
@@ -170,6 +158,71 @@ public class DocManagerUtils {
 
     public List<DocumentVar> data() {
         return this.data;
+    }
+
+    /**
+     * Gets the field value.
+     *
+     * @param nm   The field name
+     * @param tnum - The table number
+     * @param nrow - The row number
+     * @return Object - The field value
+     */
+    public static Object getValue(final String nm, final int tnum, final int nrow) {
+        Optional<DocumentVar> fld = data
+                .stream()
+                .filter(f -> f.getField().equals(nm) && f.getTabn() == tnum && f.getNrow() == nrow)
+                .findAny();
+        if (fld.isPresent()) {
+            return fld.get().getVal();
+        }
+        return null;
+    }
+
+    /**
+     * Sets the field value for a specific field
+     *
+     * @param nm   - The field name
+     * @param tnum - The table number
+     * @param nrow - The row number
+     * @param val  - The value
+     */
+    public static void setValue(final String nm,
+                                final int tnum,
+                                final int nrow,
+                                final Object val) {
+        for (int i = 0; i < data.size(); i++) {
+            DocumentVar f = data.get(i);
+            if (f.getField().equals(nm) && f.getTabn() == tnum && f.getNrow() == nrow) {
+                f.setVal(val);
+                f.setDirty(true);
+
+                return;
+            }
+        }
+
+        data.add(new DocumentVar(nm, tnum, nrow, val, true));
+    }
+
+    /**
+     * Returns true if a specific field was changed
+     *
+     * @param nm   - The field name
+     * @param tnum - The table number
+     * @param nrow - The row number
+     * @return boolean - true - the field was changed, false - the field was not changed
+     */
+    public static boolean isChanged(final String nm,
+                                    final int tnum,
+                                    final int nrow) {
+        Optional<DocumentVar> fld = data
+                .stream()
+                .filter(f -> f.getField().equals(nm) && f.getTabn() == tnum && f.getNrow() == nrow)
+                .findAny();
+        if (fld.isPresent()) {
+            return fld.get().isDirty();
+        }
+        return false;
     }
 }
 
