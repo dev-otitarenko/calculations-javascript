@@ -1,28 +1,41 @@
-package com.maestro.lib.calculations;
+package com.maestro.lib.calculations.js;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Date;
 
 /**
- * LOGGING
+ * Represents jscript object "console"
  */
-public class ConsoleLog {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleLog.class);
+public class JSConsole {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSConsole.class);
 
-    public void log(Object... objects) {
+    /**
+     * console.log
+     * @param objects - the list of objects
+     */
+    public static void log(Object... objects) {
         LOGGER.info(processMessage(objects));
     }
 
-    public void warn(Object... objects) {
+    /**
+     * console.warn
+     * @param objects - the list of objects
+     */
+    public static void warn(Object... objects) {
         LOGGER.warn(processMessage(objects));
     }
 
-    public void error(Object... objects) {
+    /**
+     * console.error
+     * @param objects - the list of objects
+     */
+    public static void error(Object... objects) {
         LOGGER.error(processMessage(objects));
     }
 
-    private String processMessage(Object... objects) {
+    private static String processMessage(Object... objects) {
         StringBuilder sb = new StringBuilder();
         for (final Object o : objects) {
             if (o instanceof String) {

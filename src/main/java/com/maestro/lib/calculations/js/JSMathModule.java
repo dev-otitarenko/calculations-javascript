@@ -1,4 +1,4 @@
-package com.maestro.lib.calculations;
+package com.maestro.lib.calculations.js;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.math.NumberUtils;
