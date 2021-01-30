@@ -29,7 +29,7 @@ class DocManagerUtilsTest {
         final List<DocumentVar> data = convDocumentData(gson, path2document);
         final List<ValidateRule> rules = convValidateRules(gson, path2rules);
 
-        LOGGER.info("validate [scenario with general streams]");
+        LOGGER.debug("validate [scenario with general streams]");
             // Scenario - 1 (general stream)
         long startTime = System.nanoTime();
 
@@ -37,22 +37,8 @@ class DocManagerUtilsTest {
         List<ValidateError> errors = docManager.validate();
         long timeElapsed = System.nanoTime() - startTime;
 
-        LOGGER.info("validate [scenario with general streams]: Execution time in milliseconds : " + timeElapsed / 1000000);
-        errors.forEach(e -> LOGGER.info("validate [scenario with general streams]: {}", e));
-
-        LOGGER.info("validate [scenario with general streams]");
-
-            // Scenario - 2 (parallel stream)
-        startTime = System.nanoTime();
-
-        docManager = new DocManagerUtils(data, rules);
-        errors = docManager.validateParallel();
-        errors.forEach(e -> System.out.println(e.getStatus() + " " + e.getMessage()));
-
-        timeElapsed = System.nanoTime() - startTime;
-
-        System.out.println("[Scenario with parallel stream - 2] Execution time in milliseconds : " + timeElapsed / 1000000);
-        errors.forEach(e -> LOGGER.info("validate [scenario with general streams]: {}", e));
+        LOGGER.debug("validate [scenario with general streams]: Execution time in milliseconds : " + timeElapsed / 1000000);
+        errors.forEach(e -> LOGGER.debug("validate [scenario with general streams]: {}", e));
     }
 
     @ParameterizedTest(name = "#{index} - Test with 'rule': {0}, answer: {1}")

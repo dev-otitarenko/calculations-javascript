@@ -1,5 +1,6 @@
 package com.maestro.lib.calculations;
 
+import com.maestro.lib.calculations.js.JSMathModule;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

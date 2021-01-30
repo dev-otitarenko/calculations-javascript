@@ -18,7 +18,7 @@ public class NashornJSMathModuleTest {
     public void setUp() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         engine = manager.getEngineByName("nashorn");
-        engine.eval("var MATH_MODULE = Java.type('com.maestro.lib.calculations.JSMathModule');");
+        engine.eval("var MATH_MODULE = Java.type('com.maestro.lib.calculations.js.JSMathModule');");
     }
 
     @Test
