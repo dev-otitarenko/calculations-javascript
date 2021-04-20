@@ -29,47 +29,14 @@ public class DocEngine {
         this.bindings = engine.createBindings();
         bindings.put("data", data);
             // bound with external functions
+        this.engine.eval("load('classpath:js/docutl.js');", bindings);
         this.engine.eval(
                 "var console = Java.type('com.maestro.lib.calculations.js.JSConsole');" +
-                        "\n var MATH_MODULE = Java.type('com.maestro.lib.calculations.js.JSMathModule');" +
-                        "\n Math.MIN = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MIN(arguments); };" +
-                        "\n Math.MAX = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MAX(arguments); };" +
-                        "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +
-                        "\n Math.AVG = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.AVG(arguments); };" +
-                        "\n isChanged = function(nm, tabNum, rowNum) {" +
-                            "\n for (var i in data) {" +
-                                "\n f = data[i];" +
-                                "\n if (f.field == nm && f.tabn == tabNum && f.nrow == rowNum) {" +
-                                     "\n console.log('Dirty: ', nm, tabNum, rowNum, f.dirty);" +
-                                    "\n return f.dirty;" +
-                                "\n }" +
-                            "\n }" +
-                            "\n return false;" +
-                        "\n }" +
-                        "\n value = function(nm, tabNum, rowNum, v) { " +
-                            "\n var f;\n" +
-                            "\n if (v === undefined) { // get" +
-                                "\n for (var i in data) {" +
-                                    "\n f = data[i];" +
-                                    "\n if (f.field == nm && f.tabn == tabNum && f.nrow == rowNum) {" +
-                                        "\n return f.val;" +
-                                    "\n }" +
-                                "\n }" +
-                                "\n return null;" +
-                            "\n } else { // set" +
-                                "\n for (var i in data) {" +
-                                    "\n f = data[i];" +
-                                    "\n if (f.field == nm && f.tabn == tabNum && f.nrow == rowNum) {" +
-                                        "\n f.val = 1*v;" +
-                                        "\n f.dirty = true;" +
-                                        "\n data[i] = f;" +
-                                        "\n return;" +
-                                    "\n }" +
-                                "\n }" +
-                                "\n f = { field: nm, tabn: tabNum, nrow: rowNum, val: v };" +
-                                "\n data.push(f);" +
-                            "\n  }" +
-                        " };"
+                    "\n var MATH_MODULE = Java.type('com.maestro.lib.calculations.js.JSMathModule');" +
+                    "\n Math.MIN = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MIN(arguments); };" +
+                    "\n Math.MAX = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.MAX(arguments); };" +
+                    "\n Math.SUM = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.SUM(arguments); };" +
+                    "\n Math.AVG = function() {  if (arguments.length == 0) return 0; return MATH_MODULE.AVG(arguments); };"
         , bindings);
         this.rules = rules;
     }
@@ -88,7 +55,7 @@ public class DocEngine {
             .filter(r -> r.isOnlyChecking() && !r.getSign().equals(ValidationSign.ALL.getName()))
             .forEach(r -> {
                 final String sign = r.getSign().equals(ValidationSign.EQ.getName()) ? "==" : r.getSign();
-                final String rule = String.format("value(\"%s\", 0, 0) %s (%s)", r.getField(), sign, ValidateRule.parse(r.getExpression(), 0, 0));
+                final String rule = String.format("Doc.value(\"%s\", 0, 0) %s (%s)", r.getField(), sign, ValidateRule.parse(r.getExpression(), 0, 0));
 
                 try {
                     LOGGER.debug("validateRule: {}", rule);
@@ -115,16 +82,16 @@ public class DocEngine {
     public List<DocumentVar> recalculate() throws ScriptException {
         LOGGER.debug("\"recalculate\" is starting...");
 
+        // init vars
+        engine.eval("var vl;", bindings);
+        // rules cycle
         rules
             .stream()
             .filter(r -> r.isOnlyFilling() && r.getSign().equals(ValidationSign.EQ.getName()))
             .forEach(r -> {
                 try {
                     LOGGER.debug("\t\"recalculate\" \"{}\" = {}", r.getField(), r.getExpression());
-                    engine.eval(
-                        String.format("value('%s', %d, %d, %s)", r.getField(), 0, 0, ValidateRule.parse(r.getExpression(), 0, 0)),
-                        bindings
-                    );
+                    exec(r.getField(), ValidateRule.parse(r.getExpression(), 0, 0), 0, 0);
                     triggerField(r.getField(), 0, 0);
                 } catch (ScriptException e) {
                     LOGGER.error("recalculate: {}", e.getMessage());
@@ -143,8 +110,10 @@ public class DocEngine {
      */
     public List<DocumentVar> changeFieldValue(final String srcNm, final int tabNum, final int rowNum, final Object val) throws ScriptException {
         LOGGER.debug("\"changeFieldValue\" is starting [\"{}\" : {}]...", srcNm, val);
+        // init vars
+        engine.eval("var vl;", bindings);
         // set value
-        engine.eval(String.format("value('%s', %d, %d, '%s')", srcNm, tabNum, rowNum, val), bindings);
+        exec(srcNm, val, tabNum, rowNum);
         // loop through rules
         rules
             .stream()
@@ -152,10 +121,7 @@ public class DocEngine {
             .forEach(r -> {
                 try {
                     LOGGER.debug("\t\"changeFieldValue\" \"{}\" = {}", r.getField(), r.getExpression());
-                    engine.eval(
-                        String.format("value('%s', %d, %d, %s)", r.getField(), tabNum, rowNum, ValidateRule.parse(r.getExpression(), tabNum, rowNum)),
-                        bindings
-                    );
+                    exec(r.getField(), ValidateRule.parse(r.getExpression(), tabNum, rowNum), tabNum, rowNum);
                     triggerField(r.getField(), tabNum, rowNum);
                 } catch (ScriptException e) {
                     LOGGER.error("changeFieldValue: {}", e.getMessage());
@@ -175,10 +141,7 @@ public class DocEngine {
                    // Boolean isChanged = (Boolean) engine.eval(String.format("isChanged('%s', %d, %d)", r.getField(), tabNum, rowNum), bindings);
                    // if (!isChanged) {
                         LOGGER.info("\t\t \"triggerField\" : \"{}\" = {}", r.getField(), r.getExpression());
-                        engine.eval(
-                            String.format("value('%s', %d, %d, %s)", r.getField(), tabNum, rowNum, ValidateRule.parse(r.getExpression(), tabNum, rowNum)),
-                            bindings
-                        );
+                        exec(r.getField(), ValidateRule.parse(r.getExpression(), tabNum, rowNum), tabNum, rowNum);
                         triggerField(r.getField(), tabNum, rowNum);
                    //; }
                 } catch (ScriptException e) {
@@ -200,5 +163,21 @@ public class DocEngine {
         LOGGER.debug("\t[execRule, \"{}\"] : {}", rule, ret);
 
         return ret;
+    }
+
+    private void exec(final String fldNm, final String expression, final int tabNum, final int rowNum) throws ScriptException {
+        LOGGER.info("\t\t\t \"exec\" [{}, {}] : \"{}\" = {}", tabNum, rowNum, fldNm, expression);
+        engine.eval(
+                String.format("vl = %s; Doc.value('%s', %d, %d, vl)", expression, fldNm, tabNum, rowNum),
+                bindings
+        );
+    }
+
+    private void exec(final String fldNm, final Object val, final int tabNum, final int rowNum) throws ScriptException {
+        LOGGER.info("\t\t\t \"exec\" [{}, {}] : \"{}\" = {}", tabNum, rowNum, fldNm, val);
+        engine.eval(
+                String.format("vl = %s; Doc.value('%s', %d, %d, vl)", val, fldNm, tabNum, rowNum),
+                bindings
+        );
     }
 }

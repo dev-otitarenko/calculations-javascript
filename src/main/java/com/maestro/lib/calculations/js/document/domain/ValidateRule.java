@@ -40,7 +40,7 @@ public class ValidateRule {
         if (fields.size() != 0) {
             for (String f : fields) {
                 final String nm = f.substring(1);
-                ret = ret.replaceAll("\\^" + nm, "value(\"" + nm + "\", " + tabNum + ", " + rowNum + ")");
+                ret = ret.replaceAll("\\^" + nm, "Doc.value(\"" + nm + "\", " + tabNum + ", " + rowNum + ")");
             }
         }
         return ret;
