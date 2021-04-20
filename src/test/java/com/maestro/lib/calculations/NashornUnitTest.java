@@ -1,6 +1,6 @@
 package com.maestro.lib.calculations;
 
-import com.maestro.lib.calculations.document.DocumentVar;
+import com.maestro.lib.calculations.js.document.domain.DocumentVar;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -117,6 +117,8 @@ public class NashornUnitTest {
         Bindings bindings = engine.createBindings();
         bindings.put("obj", names);
 
+        engine.eval("for(var k in obj) { print(obj[k]); }", bindings);
+
         String script = "var greeting='Hello ' + obj[0].val; greeting+=', ' + obj[1].val; greeting";
         Object bindingsResult = engine.eval(script, bindings);
         assertEquals("Hello Oleksii, Vadim", bindingsResult);
@@ -134,6 +136,21 @@ public class NashornUnitTest {
         Object map = engine.eval("var HashMap = Java.type('java.util.HashMap');" + "var map = new HashMap();" + "map.put('hello', 'world');" + "map");
 
         assertTrue(Map.class.isAssignableFrom(map.getClass()));
+
+        List<DocumentVar> names = Arrays.asList(
+                new DocumentVar("FEILD1", 0, 0, "Oleksii"),
+                new DocumentVar("FEILD2", 0, 0, "Vadim")
+        );
+        Bindings bindings = engine.createBindings();
+        bindings.put("obj", names);
+
+        engine.eval("for(var k in obj) { print(obj[k]); }", bindings);
+        String script = "obj[0].val = 'OLEKSII'; obj[0].dirty = true; obj";
+        Object list = engine.eval(script, bindings);
+
+        List<DocumentVar> vars = (List<DocumentVar>) list;
+        vars.forEach(System.out::println);
+        assertTrue(List.class.isAssignableFrom(list.getClass()));
     }
 
     @Test

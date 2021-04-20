@@ -1,7 +1,10 @@
-package com.maestro.lib.calculations.document;
+package com.maestro.lib.calculations.js.document;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.maestro.lib.calculations.js.document.domain.DocumentVar;
+import com.maestro.lib.calculations.js.document.domain.ValidateError;
+import com.maestro.lib.calculations.js.document.domain.ValidateRule;
 import com.maestro.lib.calculations.utils.TestUtils;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +22,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DocManagerUtilsTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocManagerUtilsTest.class);
+class DocEngineTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocEngineTest.class);
 
     @ParameterizedTest
     @CsvSource(value = { "scenario-1-data-valid.json,scenario-1-rules.json"})
@@ -33,7 +36,7 @@ class DocManagerUtilsTest {
             // Scenario - 1 (general stream)
         long startTime = System.nanoTime();
 
-        DocManagerUtils docManager = new DocManagerUtils(data, rules);
+        DocEngine docManager = new DocEngine(data, rules);
         List<ValidateError> errors = docManager.validate();
         long timeElapsed = System.nanoTime() - startTime;
 
@@ -59,8 +62,8 @@ class DocManagerUtilsTest {
                 new DocumentVar("FIELD3", 0, 0, 500)
         );
 
-        DocManagerUtils docManager = new DocManagerUtils(data, new ArrayList<>());
-        Object obj = docManager.execRule(new ValidateRule("*", "=", rule, true, true));
+        DocEngine docManager = new DocEngine(data, new ArrayList<>());
+        Object obj = docManager.exec(rule, 0, 0);
         assertEquals((double)obj, respond);
     }
 
@@ -77,9 +80,9 @@ class DocManagerUtilsTest {
         final List<ValidateRule> rules = convValidateRules(gson, path2rules);
         final List<DocumentVar> result = convDocumentData(gson, path2result);
 
-        DocManagerUtils docManager = new DocManagerUtils(data, rules);
-        docManager.calculateAllFields();
-        final List<DocumentVar> ret = docManager.data();
+        DocEngine docManager = new DocEngine(data, rules);
+        final List<DocumentVar> ret = docManager.recalculate();
+
         checkDocumentData(ret, result);
     }
 
@@ -98,9 +101,8 @@ class DocManagerUtilsTest {
         final List<ValidateRule> rules = convValidateRules(gson, path2rules);
         final List<DocumentVar> result = convDocumentData(gson, path2result);
 
-        DocManagerUtils docManager = new DocManagerUtils(data, rules);
-        docManager.changeFieldValue(fieldNm, fieldVal);
-        final List<DocumentVar> ret = docManager.data();
+        DocEngine docManager = new DocEngine(data, rules);
+        final List<DocumentVar> ret = docManager.changeFieldValue(fieldNm, 0, 0, fieldVal);;
         checkDocumentData(ret, result);
     }
 
@@ -123,7 +125,6 @@ class DocManagerUtilsTest {
     private void checkDocumentData(final List<DocumentVar> data_1,
                                    final List<DocumentVar> data_2) {
         data_1
-                .stream()
                 .forEach(f -> {
                     final DocumentVar val_res = data_2
                                                 .stream()

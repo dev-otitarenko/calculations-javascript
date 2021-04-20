@@ -1,11 +1,11 @@
 [
-  { "field": "FIELD1", "tabn": 0, "nrow": 0, "val": 0 },
-  { "field": "FIELD2", "tabn": 0, "nrow": 0, "val": 2 },
-  { "field": "FIELD3", "tabn": 0, "nrow": 0, "val": 50 },
-  { "field": "FIELD100", "tabn": 0, "nrow": 0, "val": 0 },
-  { "field": "FIELD101", "tabn": 0, "nrow": 0, "val": 0 },
-  { "field": "FIELD102", "tabn": 0, "nrow": 0, "val": 0 },
-  { "field": "FIELD200", "tabn": 0, "nrow": 0, "val": 0 },
-  { "field": "FIELD201", "tabn": 0, "nrow": 0, "val": 0 },
-  { "field": "FIELD202", "tabn": 0, "nrow": 0, "val": 0 }
+  { "field": "FIELD1", "tabn": 0, "nrow": 0, "val": 0, "dirty": false },
+  { "field": "FIELD2", "tabn": 0, "nrow": 0, "val": 2, "dirty": false },
+  { "field": "FIELD3", "tabn": 0, "nrow": 0, "val": 50, "dirty": false },
+  { "field": "FIELD100", "tabn": 0, "nrow": 0, "val": 0, "dirty": false},
+  { "field": "FIELD101", "tabn": 0, "nrow": 0, "val": 0, "dirty": false },
+  { "field": "FIELD102", "tabn": 0, "nrow": 0, "val": 0, "dirty": false },
+  { "field": "FIELD200", "tabn": 0, "nrow": 0, "val": 0, "dirty": false },
+  { "field": "FIELD201", "tabn": 0, "nrow": 0, "val": 0, "dirty": false },
+  { "field": "FIELD202", "tabn": 0, "nrow": 0, "val": 0, "dirty": false }
 ]

@@ -1,4 +1,4 @@
-package com.maestro.lib.calculations.document;
+package com.maestro.lib.calculations.js.document.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

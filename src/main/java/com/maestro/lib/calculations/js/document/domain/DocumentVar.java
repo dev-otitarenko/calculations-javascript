@@ -1,4 +1,4 @@
-package com.maestro.lib.calculations.document;
+package com.maestro.lib.calculations.js.document.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 /**
  * Class describing row in a data set
  */
@@ -48,6 +47,6 @@ public class DocumentVar {
 
     @Override
     public String toString() {
-        return String.format("DocumentVar { [%b] field: \"%s\", tabn: %d, nrow: %d, val: %s }", this.dirty, this.field, this.tabn, this.nrow, this.val);
+        return String.format("DocumentVar { field: \"%s\", tabn: %d, nrow: %d, val: %s, dirty: %b }", this.field, this.tabn, this.nrow, this.val, this.dirty);
     }
 }
